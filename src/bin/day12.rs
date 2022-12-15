@@ -1,53 +1,11 @@
+use advent_of_code_2022::grid::{Grid, Position};
 use std::collections::{HashSet, VecDeque};
 
 const FILE: &str = "inputs/day12.txt";
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-struct Position {
-    x: usize,
-    y: usize,
-}
+type Map = Grid<u8>;
 
-impl Position {
-    pub fn new(x: usize, y: usize) -> Self {
-        Position { x, y }
-    }
-
-    pub fn neighbours(self) -> impl Iterator<Item = Position> {
-        self.x
-            .checked_sub(1)
-            .map(|x| Position::new(x, self.y))
-            .into_iter()
-            .chain(Some(Position::new(self.x + 1, self.y)).into_iter())
-            .chain(
-                self.y
-                    .checked_sub(1)
-                    .map(|y| Position::new(self.x, y))
-                    .into_iter(),
-            )
-            .chain(Some(Position::new(self.x, self.y + 1)))
-    }
-}
-
-#[derive(Debug, Clone)]
-#[allow(dead_code)]
-struct Grid {
-    height: usize,
-    width: usize,
-    grid: Vec<u8>,
-}
-
-impl Grid {
-    pub fn get(&self, position: Position) -> Option<&u8> {
-        if position.x < self.width {
-            self.grid.get(position.x + position.y * self.width)
-        } else {
-            None
-        }
-    }
-}
-
-fn parse_input(input: &str) -> (Position, Position, Grid) {
+fn parse_input(input: &str) -> (Position, Position, Map) {
     let height = input.lines().count();
     let width = input.lines().next().unwrap_or_default().len();
     let mut start = Position::default();
@@ -72,11 +30,7 @@ fn parse_input(input: &str) -> (Position, Position, Grid) {
     (
         start,
         end,
-        Grid {
-            height,
-            width,
-            grid,
-        },
+        Map::new(height, width, grid).expect("Shouldn't fail."),
     )
 }
 
