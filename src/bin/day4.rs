@@ -1,23 +1,9 @@
+use advent_of_code_2022::range_extension::RangeExtension;
 use std::ops::RangeInclusive;
 
 const FILE: &str = "inputs/day4.txt";
 
 type SectionId = u32;
-
-trait RangeExtension {
-    fn contains_range(&self, other: &Self) -> bool;
-    fn overlaps(&self, other: &Self) -> bool;
-}
-
-impl<U: Sized + PartialOrd> RangeExtension for RangeInclusive<U> {
-    fn contains_range(&self, other: &Self) -> bool {
-        self.contains(other.start()) && self.contains(other.end())
-    }
-
-    fn overlaps(&self, other: &Self) -> bool {
-        self.contains(other.start()) || other.contains(self.start())
-    }
-}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let assignments: Vec<(RangeInclusive<SectionId>, RangeInclusive<SectionId>)> =

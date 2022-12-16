@@ -8,6 +8,18 @@ impl Position {
     pub const fn new(x: isize, y: isize) -> Self {
         Position { x, y }
     }
+
+    pub const fn x(self) -> isize {
+        self.x
+    }
+
+    pub const fn y(self) -> isize {
+        self.y
+    }
+
+    pub const fn manhattan_distance(self, other: Self) -> isize {
+        (self.x - other.x).abs() + (self.y - other.y).abs()
+    }
 }
 
 impl std::ops::Add<Direction> for Position {
