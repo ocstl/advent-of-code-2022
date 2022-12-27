@@ -1,4 +1,4 @@
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Position {
     x: isize,
     y: isize,
@@ -45,6 +45,11 @@ impl std::ops::Sub<Position> for Position {
     }
 }
 
+pub const UP: Direction = Direction { dx: 0, dy: 1 };
+pub const DOWN: Direction = Direction { dx: 0, dy: -1 };
+pub const LEFT: Direction = Direction { dx: -1, dy: 0 };
+pub const RIGHT: Direction = Direction { dx: 1, dy: 0 };
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Direction {
     dx: isize,
@@ -70,10 +75,10 @@ impl TryFrom<char> for Direction {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            'U' => Ok(Direction::new(0, 1)),
-            'D' => Ok(Direction::new(0, -1)),
-            'L' => Ok(Direction::new(-1, 0)),
-            'R' => Ok(Direction::new(1, 0)),
+            'U' => Ok(UP),
+            'D' => Ok(DOWN),
+            'L' => Ok(LEFT),
+            'R' => Ok(RIGHT),
             _ => Err(value),
         }
     }
