@@ -113,3 +113,44 @@ pub enum Direction {
     UpRight,
     DownRight,
 }
+
+impl Direction {
+    pub fn rotate_left(self) -> Self {
+        match self {
+            Direction::Up => Direction::Left,
+            Direction::Down => Direction::Right,
+            Direction::Left => Direction::Down,
+            Direction::Right => Direction::Up,
+            Direction::UpLeft => Direction::DownLeft,
+            Direction::DownLeft => Direction::DownRight,
+            Direction::UpRight => Direction::UpLeft,
+            Direction::DownRight => Direction::UpRight,
+        }
+    }
+
+    pub fn rotate_right(self) -> Self {
+        match self {
+            Direction::Up => Direction::Right,
+            Direction::Down => Direction::Left,
+            Direction::Left => Direction::Up,
+            Direction::Right => Direction::Down,
+            Direction::UpLeft => Direction::UpRight,
+            Direction::DownLeft => Direction::UpLeft,
+            Direction::UpRight => Direction::DownRight,
+            Direction::DownRight => Direction::DownLeft,
+        }
+    }
+
+    pub fn reverse(self) -> Self {
+        match self {
+            Direction::Up => Direction::Down,
+            Direction::Down => Direction::Up,
+            Direction::Left => Direction::Right,
+            Direction::Right => Direction::Left,
+            Direction::UpLeft => Direction::DownRight,
+            Direction::DownLeft => Direction::UpRight,
+            Direction::UpRight => Direction::DownLeft,
+            Direction::DownRight => Direction::UpLeft,
+        }
+    }
+}
