@@ -45,12 +45,20 @@ impl std::ops::Sub<Position> for Position {
     }
 }
 
+// DOWN and UP are reversed, for reasons...
 pub const UP: Direction = Direction { dx: 0, dy: 1 };
 pub const DOWN: Direction = Direction { dx: 0, dy: -1 };
 pub const LEFT: Direction = Direction { dx: -1, dy: 0 };
 pub const RIGHT: Direction = Direction { dx: 1, dy: 0 };
+pub const UP_LEFT: Direction = Direction { dx: -1, dy: 1 };
+pub const UP_RIGHT: Direction = Direction { dx: 1, dy: 1 };
+pub const DOWN_LEFT: Direction = Direction { dx: -1, dy: -1 };
+pub const DOWN_RIGHT: Direction = Direction { dx: 1, dy: -1 };
+pub const DIRECTIONS: [Direction; 8] = [
+    UP, DOWN, LEFT, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT,
+];
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Direction {
     dx: isize,
     dy: isize,
