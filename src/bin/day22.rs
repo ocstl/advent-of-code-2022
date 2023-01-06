@@ -123,13 +123,7 @@ fn password(position: Position, direction: Direction) -> usize {
         }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let input = std::fs::read_to_string(FILE)?;
-    let (map, instructions) = input.split_once("\n\n").unwrap_or_default();
-    let map: MonkeyMap = map.parse()?;
-    let instructions = parse_instructions(instructions);
-
-    // Follow the path given in the monkeys' notes. What is the final password?
+fn part1(instructions: &[Instruction], map: &MonkeyMap) -> usize {
     let mut direction = Direction::Right;
     let mut position = map
         .iter()
@@ -147,7 +141,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for instruction in instructions {
         match instruction {
             Instruction::Steps(steps) => {
-                'outer: for _ in 0..steps {
+                'outer: for _ in 0..*steps {
                     let mut next = (position + direction).expect("Can't fail.");
                     loop {
                         match map.get(&next) {
@@ -183,8 +177,209 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    let part1 = password(position, direction);
+    password(position, direction)
+}
+
+fn part2(instructions: &[Instruction], map: &MonkeyMap) -> usize {
+    let mut direction = Direction::Right;
+    let mut position = map
+        .iter()
+        .filter_map(|(position, tile)| {
+            if *tile == Tile::Open && position.y() == 1 {
+                Some(position)
+            } else {
+                None
+            }
+        })
+        .min_by_key(|position| position.x())
+        .copied()
+        .unwrap_or_default();
+
+    for instruction in instructions {
+        match instruction {
+            Instruction::Steps(steps) => {
+                'outer: for _ in 0..*steps {
+                    let mut next = (position + direction).expect("Can't fail.");
+                    match map.get(&next) {
+                        Some(Tile::Open) => {
+                            position = next;
+                        }
+                        Some(Tile::Wall) => {
+                            break 'outer;
+                        }
+                        // Hard-coded because it's easier. Our cube is shaped like so:
+                        //  AB
+                        //  C
+                        // ED
+                        // F
+                        None => match (direction, next.x(), next.y()) {
+                            (Direction::Up, 51..=100, 0) => {
+                                // A to F.
+                                next = Position::new(1, next.x() + 100);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Right;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Left, 0, 151..=200) => {
+                                // F to A.
+                                next = Position::new(next.y() - 100, 1);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Down;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Up, 101..=150, 0) => {
+                                // B to F.
+                                next = Position::new(next.x() - 100, 200);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Up;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Down, 1..=50, 201) => {
+                                // F to B.
+                                next = Position::new(next.x() + 100, 1);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Down;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Up, 1..=50, 100) => {
+                                // E to C.
+                                next = Position::new(51, next.x() + 50);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Right;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Left, 50, 51..=100) => {
+                                // C to E.
+                                next = Position::new(next.y() - 50, 101);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Down;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Down, 101..=150, 51) => {
+                                // B to C.
+                                next = Position::new(100, next.x() - 50);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Left;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Right, 101, 51..=100) => {
+                                // C to B.
+                                next = Position::new(next.y() + 50, 50);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Up;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Down, 51..=100, 151) => {
+                                // D to F.
+                                next = Position::new(50, next.x() + 100);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Left;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Right, 51, 151..=200) => {
+                                // F to D.
+                                next = Position::new(next.y() - 100, 150);
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Up;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Left, 50, 1..=50) => {
+                                // A to E.
+                                next = Position::new(1, 151 - next.y());
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Right;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Left, 0, 101..=150) => {
+                                // E to A.
+                                next = Position::new(51, 151 - next.y());
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Right;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Right, 151, 1..=50) => {
+                                // B to D.
+                                next = Position::new(100, 151 - next.y());
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Left;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            (Direction::Right, 101, 101..=150) => {
+                                // D to B.
+                                next = Position::new(150, 151 - next.y());
+                                if let Some(Tile::Open) = map.get(&next) {
+                                    position = next;
+                                    direction = Direction::Left;
+                                } else {
+                                    break 'outer;
+                                }
+                            }
+                            _ => unreachable!("Wrong path: {:?}, {:?}", next, direction),
+                        },
+                    }
+                }
+            }
+            Instruction::TurnLeft => direction = direction.rotate_left(),
+            Instruction::TurnRight => direction = direction.rotate_right(),
+        }
+    }
+
+    password(position, direction)
+}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let input = std::fs::read_to_string(FILE)?;
+    let (map, instructions) = input.split_once("\n\n").unwrap_or_default();
+    let map: MonkeyMap = map.parse()?;
+    let instructions = parse_instructions(instructions);
+
+    // Follow the path given in the monkeys' notes. What is the final password?
+    let part1 = part1(&instructions, &map);
     println!("Part 1: {part1}");
+
+    // Fold the map into a cube, then follow the path given in the monkeys'
+    // notes. What is the final password?
+    let part2 = part2(&instructions, &map);
+    println!("Part 2: {part2}");
 
     Ok(())
 }
